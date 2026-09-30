@@ -6,11 +6,8 @@ on:
   pull_request:
 
 jobs:
-  backend:
+  tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -18,22 +15,13 @@ jobs:
           php-version: '8.5'
           extensions: pdo_sqlite, intl, bcmath
           coverage: none
-      - run: composer install --no-interaction --prefer-dist
-      - run: cp .env.example .env && php artisan key:generate
-      - run: vendor/bin/pint --test
-      - run: php artisan test
-
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+      - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: vendor/bin/pint --test
+      - run: php artisan test

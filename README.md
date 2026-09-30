@@ -4,9 +4,13 @@ Application de gestion des demandes d'achat internes : enveloppes budgétaires, 
 
 ## Stack
 
-- **backend/** — Laravel 13 (API uniquement, authentification SPA par cookie via Sanctum)
-- **frontend/** — Vue 3 + Vite, Pinia, Vue Router, Axios, Tailwind CSS
+Un seul projet Laravel 13 qui sert à la fois l'API et le front :
+
+- **API** — Laravel (`routes/api.php`), authentification par cookie de session via Sanctum
+- **Front** — Vue 3 (SPA) dans `resources/js/`, compilé par Vite : Vue Router, Pinia, Axios, Tailwind CSS
 - **MySQL 8.4** via Docker Compose
+
+Laravel renvoie `resources/views/app.blade.php` pour toute URL hors `/api` ; Vue Router prend ensuite le relais. Front et API partagent la même origine : pas de CORS.
 
 ## Démarrage (Docker)
 
@@ -14,26 +18,25 @@ Application de gestion des demandes d'achat internes : enveloppes budgétaires, 
 make setup   # première installation
 make up      # démarrer
 make down    # arrêter
-make test    # tests backend
+make test    # tests
 make reset   # base réinitialisée + seed
 ```
 
-- Frontend : http://localhost:8080
-- API : http://localhost:8000/api
+Application : http://localhost:8000
 
 ## Développement local (sans Docker)
 
 ```bash
-cd backend && cp .env.example .env && composer install && php artisan key:generate && php artisan migrate --seed && php artisan serve
+cp .env.example .env && composer install && npm install && php artisan key:generate && php artisan migrate --seed
 ```
 
 ```bash
-cd frontend && npm install && npm run dev
+composer run dev
 ```
 
-Le serveur Vite (http://localhost:5173) proxifie `/api` et `/sanctum` vers le backend.
+`composer run dev` lance le serveur Laravel, la file de jobs, les logs et Vite en même temps.
 
-## Architecture backend
+## Architecture
 
 ```
 app/
@@ -51,6 +54,15 @@ app/
 ├── Enums/
 ├── Exceptions/
 └── Support/                utilitaires (Money…)
+
+resources/js/
+├── app.js                  point d'entrée (Vue + Pinia + Router)
+├── api/                    tous les appels Axios (http.js = instance commune)
+├── stores/                 Pinia (utilisateur connecté, rôle)
+├── router/                 routes + gardes
+├── views/                  pages
+├── components/
+└── utils/
 ```
 
 Les liaisons interface → implémentation se déclarent dans `AppServiceProvider::$bindings`.

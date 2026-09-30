@@ -1,11 +1,13 @@
 {
-    "name": "achats-internes-frontend",
+    "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview"
+        "dev": "vite"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
         "axios": "^1.20.0",
@@ -16,6 +18,7 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-vue": "^6.0.9",
+        "laravel-vite-plugin": "^3.2.0",
         "tailwindcss": "^4.3.3",
         "vite": "^8.3.1"
     }

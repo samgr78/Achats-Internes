@@ -1,3 +1,16 @@
+# --- Build des assets Vue / Tailwind ---
+FROM node:24-alpine AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+# --- Application Laravel ---
 FROM php:8.5-cli-alpine
 
 RUN apk add --no-cache $PHPIZE_DEPS icu-dev libzip-dev \
@@ -12,6 +25,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-interaction --no-scripts --no-autoloader --prefer-dist
 
 COPY . .
+COPY --from=assets /app/public/build ./public/build
 RUN composer dump-autoload --optimize \
     && chown -R www-data:www-data storage bootstrap/cache
 
